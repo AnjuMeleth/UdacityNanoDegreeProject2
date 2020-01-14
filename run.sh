@@ -3,7 +3,7 @@ echo "Checking if $1 stack exists ..."
 
 if ! aws cloudformation describe-stacks --region us-west-2 --stack-name $1 ; then
 
-  echo -e "\nStack does not exist, creating ..."
+  echo -e "Stack does not exist, creating $1 ..."
   aws cloudformation create-stack \
   --stack-name $1 \
   --template-body file://$2 \
@@ -16,7 +16,7 @@ if ! aws cloudformation describe-stacks --region us-west-2 --stack-name $1 ; the
 
 else
 
-  echo -e "\nStack exists, attempting update ..."
+  echo -e "Stack $1 exists, attempting update ..."
 
   
   update_output=$( aws cloudformation update-stack \
@@ -35,16 +35,16 @@ else
 
     # Don't fail for no-op update
     if [[ $update_output == *"ValidationError"* && $update_output == *"No updates"* ]] ; then
-      echo -e "\nFinished create/update - no updates performed"
+      echo -e "\nFinished with no updates "
       exit 0
     else
       exit $status
     fi
   fi
   
-  echo "Waiting for stack $1 update to complete ..."
+  echo "Waiting for stack $1 update to finish ..."
   aws cloudformation wait stack-update-complete --stack-name $1 --region=us-west-2
 
 fi
 
-echo "Finished create/update successfully!"
+echo "Finished successfully!"
